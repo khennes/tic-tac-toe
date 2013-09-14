@@ -1,0 +1,82 @@
+/* Main CSS styles for Tic Tac Toe */
+
+
+body {
+    background: #031634;
+    color: #e8ddcb;
+    font-size: 18px;
+    margin: 60px;
+}
+
+h1 {
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size: 64px;
+    text-align: center;
+}
+
+#gameboard {
+    height: 308px;
+    width: 308px;
+    margin: 0 auto;
+    padding: 50px 0 50px 0;
+}
+
+#play-game {
+    display: block;
+    margin: 0 auto;
+    width: 107px;
+}
+
+#button {
+    background-color: #e8ddcb;
+    border: solid 5px #cdb380;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    color: #033649;
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size: 20px;
+}
+
+.box {
+    float: left;
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 124px;
+    font-weight: bold;
+    height: 100px;
+    text-align: center;
+    width: 100px;
+}
+
+#sq2 {
+    border-top: 0;
+    border-right: solid #e8ddcb 4px;
+    border-bottom: 0; 
+    border-left: solid #e8ddcb 4px;
+}
+
+#sq4 {
+    border-top: solid #e8ddcb 4px;
+    border-right: 0;
+    border-bottom: solid #e8ddcb 4px;
+    border-left: 0;
+}
+
+#sq5 {
+    border: solid #e8ddcb 4px;
+}
+
+#sq6 {
+    border-top: solid #e8ddcb 4px;
+    border-right: 0;
+    border-bottom: solid #e8ddcb 4px;
+    border-left: 0;
+}
+
+#sq8 {
+    border-top: 0;
+    border-right: solid #e8ddcb 4px;
+    border-bottom: 0; 
+    border-left: solid #e8ddcb 4px;
+}
+
