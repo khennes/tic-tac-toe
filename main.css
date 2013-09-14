@@ -1,6 +1,5 @@
 /* Main CSS styles for Tic Tac Toe */
 
-
 body {
     background: #031634;
     color: #e8ddcb;
@@ -8,34 +7,53 @@ body {
     margin: 60px;
 }
 
-h1 {
-    font-family: 'Open Sans Condensed', sans-serif;
-    font-size: 64px;
-    text-align: center;
+#gamestate-message #user-message {
+    font-family: 'Indie Flower', sans-serif;
+    font-size: 36px;
+    height: 38px;
+    margin: 0 auto;
+    padding-bottom: 25px;
+    width: 375px;
 }
 
-#gameboard {
-    height: 308px;
-    width: 308px;
-    margin: 0 auto;
-    padding: 50px 0 50px 0;
+#user-message {
+    font-size: 24px;
+    height: 25px;
 }
 
 #play-game {
     display: block;
     margin: 0 auto;
-    width: 107px;
+    width: 209px;
 }
 
-#button {
+#play, #restart {
     background-color: #e8ddcb;
-    border: solid 5px #cdb380;
+    border: solid 3px #cdb380;
     -webkit-border-radius: 15px;
     -moz-border-radius: 15px;
     border-radius: 15px;
     color: #033649;
     font-family: 'Open Sans Condensed', sans-serif;
     font-size: 20px;
+    padding: 5px;
+}
+
+#play {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+#restart {
+    margin-left: 15px;
+    padding: 5px 10px 5px 10px;
+}
+
+#gameboard {
+    height: 308px;
+    width: 308px;
+    margin: 0 auto;
+    padding: 15px 0 50px 0;
 }
 
 .box {

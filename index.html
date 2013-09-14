@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <title>TicTacToe.js</title>
-  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Josefin+Sans:400,600,700|Open+Sans+Condensed:700" />
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Josefin+Sans:400,600,700|Open+Sans+Condensed:700|Indie+Flower" />
   <link rel="stylesheet" href="main.css" />
-  <script src="ttt.js"></script>
 </head>
 <body>
-  <!-- <h1>Tic Tac Toe</h1> -->
+  <div id="gamestate-message"></div>
+  <div id="user-message"></div>
   <div id="gameboard">
     <div id="sq1" class="box"></div>
     <div id="sq2" class="box"></div>
@@ -21,8 +21,10 @@
     <div id="sq9" class="box"></div>
   </div>
   <div id="play-game">
-    <input id="button" type="button" value="Play game">
+    <input id="play" type="button" value="Play game">
+    <input id="restart" type="button" value="Restart">
   </div>
+  <script src="ttt.js"></script>
 </body>
 </html>
 
