@@ -23,7 +23,6 @@
 
     // computer makes first move (pseudorandomly seed board)
     function seedBoard() {
-        gamestate = true;
         var randomDiv = Math.floor(Math.random()*9)+1;
         var firstMove = document.getElementById('sq' + randomDiv);
         firstMove.innerHTML = 'O';
@@ -34,19 +33,25 @@
 
     // begin game when user clicks "Play game"
     function startGame() {
-        seedBoard();
-        // event delegation: add eventListener to parent div
-        message.innerHTML = "";
-        gameboard.addEventListener('click', function(e){
-            if (e.target && lastMove === 'computer') {
-                var nextMove = document.getElementById(e.target.id);
-                if (nextMove.innerHTML === "") {
-                    playSquare(nextMove);
-                } else {
-                    message.innerHTML = "Sorry, looks like that square is taken.";
+        if (gamestate === false) {
+            gamestate = true;
+            console.log("New game starting! Gamestate is " + gamestate);
+            message.innerHTML = "";
+            window.setTimeout(seedBoard, 400);
+
+            // event delegation: add eventListener to parent div
+            gameboard.addEventListener('click', function(e){
+                if (e.target && lastMove === 'computer') {
+                    message.innerHTML = "";
+                    var nextMove = document.getElementById(e.target.id);
+                    if (nextMove.innerHTML === "") {
+                        playSquare(nextMove);
+                    } else {
+                        message.innerHTML = "Sorry, that square's taken.";
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     function endGame() {
@@ -59,37 +64,37 @@
         // if a tie
         endGameMessage = "...and it's a tie. Boring.";
         message.innerHTML = "Game over! " + endGameMessage;
+        gamestate = false;
     }
 
     // allow user to reset board
     function clearBoard() {
-        console.log("Starting new game!");
-        gamestate = false;    
-        compMoves = 0;
-        userMoves = 0;
+        if (gamestate === true) {
+            console.log("Restarting!");
+            gamestate = false;    
 
-        squaresPlayed = {
-            'X': [],
-            'O': []
-        };
+            // clear the gameboard
+            for (var i = 0; i < gameboard.childNodes.length; i++) {
+                gameboard.childNodes[i].innerHTML = "";
+            }
 
-        message.innerHTML = "Click 'Play game' to start";
+            compMoves = 0;
+            userMoves = 0;
 
-        // clear the gameboard
-        for (var i = 0; i < gameboard.childNodes.length; i++) {
-            i.innerHTML = "";
+            squaresPlayed = {
+                'X': [],
+                'O': []
+            };
+
+            message.innerHTML = "Click 'Play game' to start";
         }
     }
 
     // button handlers
-    if (gamestate === false) {
-        playButton.onclick = startGame;
-    }
-    if (gamestate === true) {
-        restartButton.onclick = clearBoard;
-    }
+    playButton.onclick = startGame;
+    restartButton.onclick = clearBoard;
 
-    // print X to board
+    // print user's next move to board
     function playSquare(nextMove) {
         if (gamestate === true) {
             console.log("You clicked: " + nextMove.id);
@@ -97,6 +102,19 @@
             squaresPlayed['X'].push(nextMove.id);
             userMoves++;
             lastMove = 'user';
+        }
+    }
+
+    function positionEval(currentState) {
+        var openSquares;
+        for (var i = 0; i < gameboard.childNodes.length; i++) {
+            if (gameboard.childNodes[i] === "") {
+                openSquares.push(childNodes[i]);
+            }
+
+        // calculate utility of each free square on the board
+        for (var i = 0; i < openSquares.length; i++) {
+            
         }
     }
 }())
