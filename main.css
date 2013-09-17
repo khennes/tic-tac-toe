@@ -7,18 +7,13 @@ body {
     margin: 60px;
 }
 
-#gamestate-message #user-message {
+#message {
     font-family: 'Indie Flower', sans-serif;
     font-size: 36px;
     height: 38px;
     margin: 0 auto;
-    padding-bottom: 25px;
+    padding-bottom: 35px;
     width: 375px;
-}
-
-#user-message {
-    font-size: 24px;
-    height: 25px;
 }
 
 #play-game {
@@ -66,35 +61,34 @@ body {
     width: 100px;
 }
 
-#sq2 {
+#s1 {
     border-top: 0;
     border-right: solid #e8ddcb 4px;
     border-bottom: 0; 
     border-left: solid #e8ddcb 4px;
 }
 
-#sq4 {
+#s3 {
     border-top: solid #e8ddcb 4px;
     border-right: 0;
     border-bottom: solid #e8ddcb 4px;
     border-left: 0;
 }
 
-#sq5 {
+#s4 {
     border: solid #e8ddcb 4px;
 }
 
-#sq6 {
+#s5 {
     border-top: solid #e8ddcb 4px;
     border-right: 0;
     border-bottom: solid #e8ddcb 4px;
     border-left: 0;
 }
 
-#sq8 {
+#s7 {
     border-top: 0;
     border-right: solid #e8ddcb 4px;
     border-bottom: 0; 
     border-left: solid #e8ddcb 4px;
 }
-
