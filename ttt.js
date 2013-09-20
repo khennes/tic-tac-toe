@@ -5,12 +5,11 @@
      * Define global variables.
      **/
 
-    var i,
-        game = false,
+    var game = false,
         currentPlayer,
-        gamestate,
         computer = 'O',
         user = 'X',
+        gamestate,
         movesMade = {},
         gameboard = document.getElementById('gameboard'),
         userMessage = document.getElementById('message'),
@@ -33,7 +32,7 @@
         userMessage.innerHTML = "Click 'Play game' to start";
 
         // clear the gameboard DOM element
-        for (i = 0; i < SQUARES; i++) {
+        for (var i = 0; i < SQUARES; i++) {
             gameboard.childNodes[i].innerHTML = "";
         }
     }())
@@ -74,61 +73,55 @@
 
 
     /**
-     * Check for winners.
-     * Loop through 8 possible winning "triplets" and check if any is contained
-     * within User's or Computer's movesMade. 
-     * To do this, make copies of movesMade[computer] and movesMade[user], passing
-     * by value.
+     * Check gameboard for a winning three-in-a-row.
+     *
+     * Loop through 8 possible winning "triplets" and check if any 3 squares 
+     * are all contained within User's or Computer's movesMade. 
+     *
+     * If a winner is found, whether or not the gameboard is full, terminate 
+     * the game and return 'computer' or 'user'.
+     * If the gameboard is full and no winner is found, terminate the game and 
+     * return 'draw'; otherwise, the game continues & the function returns no value.
      **/
 
-    function checkWinner() {
+    function isGameOver(currentGamestate) {
         console.log("Checking if we have a winner...");
         console.log("X: " + movesMade[user] + ", O: " + movesMade[computer]);
 
-        var move, i, j,
-            computerMoves = [],
-            userMoves = [],
-            COMPMOVES = movesMade[computer].length,
-            USERMOVES = movesMade[user].length,
-            WINS = possibleWins.length;
+        var win,
+            draw = 'draw',
+            WINS = possibleWins.length,
+            openSquares = getOpenSquares(currentGamestate);
 
-        // make copies of movesMade, passing by value, and sort
-        for (move = 0; move < COMPMOVES; move++) {
-            computerMoves.push(movesMade[computer][move]);
-        }
-        for (move = 0; move < USERMOVES; move++) {
-            userMoves.push(movesMade[user][move]);
-        }
-        computerMoves.sort();
-        userMoves.sort();
+        // improve this verbose madness
+        for (win = 0; win < WINS; win++) {
 
-        // improve this
-        for (i = 0; i < WINS; i++) {
-            console.log("Triplet: " + possibleWins[i]);
-            var count = 0;
-            // var win = parseInt(possibleWins[i].join());
-            if (computerMoves.indexOf(possibleWins[i][0]) !== -1) count++;
-            else continue;
-            if (computerMoves.indexOf(possibleWins[i][1]) !== -1) count++;
-            else continue;
-            if (computerMoves.indexOf(possibleWins[i][2]) !== -1) count++;
-            else continue;
-            if (count === 3) {
-                console.log("Computer wins");
+            // first, check if computer's moves contain the winning combination
+            if ((movesMade[computer].indexOf(possibleWins[win][0]) !== -1) && 
+                (movesMade[computer].indexOf(possibleWins[win][1]) !== -1) && 
+                (movesMade[computer].indexOf(possibleWins[win][2]) !== -1)) {
+
+                // TODO: Message should only print if actual game is over
+                console.log("Computer wins!");
+                game = false;
+                userMessage.innerHTML = "Game over. You lose :)";
                 return computer;
-            }
-        }
-        for (i = 0; i < WINS; i++) {
-            var count = 0;
-            if (userMoves.indexOf(possibleWins[i][0]) !== -1) count++;
-            else continue;
-            if (userMoves.indexOf(possibleWins[i][1]) !== -1) count++;
-            else continue;
-            if (userMoves.indexOf(possibleWins[i][2]) !== -1) count++;
-            else continue;
-            if (count === 3) {
-                console.log("User wins");
-                return user;
+            
+            // then, check if user's moves contain the winning combination
+            } else if ((movesMade[user].indexOf(possibleWins[win][0]) !== -1) && 
+                    (movesMade[user].indexOf(possibleWins[win][1]) !== -1) && 
+                    (movesMade[user].indexOf(possibleWins[win][2]) !== -1)) {
+                        console.log("You win :(");
+                        game = false;
+                        userMessage.innerHTML = "Game over. You win :(";
+                        return user;
+
+            // otherwise, if board is full, game ends in a draw 
+            } else if (openSquares.length === 0) {
+                console.log("It's a tie.");
+                game = false;
+                userMessage.innerHTML = "Game over. It's a draw.";
+                return draw;
             }
         }
     }
@@ -139,47 +132,23 @@
      * (2) Update global gamestate 
      * (3) Add square to player's list of moves made 
      *
-     * If player has made at least 3 moves, check the gameboard
-     * for a possible win.
+     * If player has made at least 3 moves, call isGameOver() 
+     * to check the gameboard for a possible win.
      **/
 
     function makeMove(player, nextMove) {
         console.log("Making a move...");
-        var moveIndex = nextMove.id.replace('s', '');
-        if (player === user) {
-            nextMove.innerHTML = user;
-            gamestate[moveIndex] = user;
-            movesMade[user].push(moveIndex);
+        var winner,
+            moveIndex = parseInt(nextMove.id.replace('s', ''));
 
-            if (movesMade[user].length >= 3) {
-                var winner = checkWinner();
-                if (winner) endGame();
-            }
+        nextMove.innerHTML = player;
+        gamestate[moveIndex] = player;
+        movesMade[player].push(moveIndex);
 
-        } else if (player === computer) {
-            nextMove.innerHTML = computer;
-            gamestate[moveIndex] = computer;
-            movesMade[computer].push(moveIndex);
-
-            if (movesMade[computer].length >= 3) {
-                var winner = checkWinner();
-                if (winner) endGame();
-            }
+        if (movesMade[player].length >= 3) {
+            console.log("More than 3, going to check for a winner.");
+            isGameOver(gamestate);
         }
-    }
-
-    // undo moves (for negamax speculative gameboards)
-    function undoMove(player, lastMove) {
-        console.log("Undoing last move...");
-        var moveIndex = lastMove.id.replace('s', '');
-        lastMove.innerHTML = '';
-        gamestate[moveIndex] = '-';
-        if (game === true && player === user) {
-            movesMade[user].pop();
-        } else if (player === computer) {
-            movesMade[computer].pop();
-        }
-        console.log("Gamestate: " + gamestate);
     }
 
     // allow user to reset game by clicking "Restart"
@@ -187,29 +156,11 @@
     restartButton.addEventListener('click', function(e) {
         if (game === true) {
             game = false;
-            initialize();
+            window.setTimeout(initialize, 1000);
             console.log("Restarting!");
         }
     });
 
-    // report game result to user
-    function endGame() {
-        console.log("Ending the game...");
-        var endGameMessage,
-            winner = checkWinner();
-        game = false;
-        if (winner) {
-            if (winner === computer) {
-                endGameMessage = "You lose.";
-            } else if (winner === user) {
-                endGameMessage = "You win!";
-            } 
-        } else {
-            endGameMessage = "It's a draw.";
-        }
-        userMessage.innerHTML = "Game over! " + endGameMessage;
-    }
- 
 
     /**
      * Taking turns
@@ -234,14 +185,12 @@
             var nextMove = document.getElementById(e.target.id),
                 openSquares = getOpenSquares(gamestate),
                 moveIndex = nextMove.id.replace('s', '');
-            if (openSquares.length === 0) endGame();
 
             if (gamestate[moveIndex] === '-') {
                 makeMove(user, nextMove);
                 currentPlayer = computer;
                 computerNextMove();
             } else {
-                console.log("Square occupied by a: " + gamestate[moveIndex]);
                 userMessage.innerHTML = "That square's taken!";
             }
         }
@@ -260,15 +209,17 @@
         console.log("Calculating computer's next move...");
         var i,
             score,
-            maxDepth = 8,
-            openSquares = getOpenSquares(gamestate),
-            OPEN = openSquares.length,
+            openSquares,
+            OPEN,
             player,
             bestMove,
             bestScore = {
                 'val': -1000000,
             },
             gamestateCopy;
+
+        openSquares = getOpenSquares(gamestate);
+        OPEN = openSquares.length;
 
         // if no empty squares, game is over
         if (OPEN === 0) {
@@ -279,20 +230,15 @@
 
                 // make speculative move
                 gamestateCopy[openSquares[i]] = computer;
-                console.log("Open squares: " + openSquares);
-                console.log("Gamestate copy after first speculative move: " + gamestateCopy);
                 movesMade[computer].push(openSquares[i]);
-                console.log("MAIN LOOP. What square am I pushing to movesMade? " + openSquares[i]);
-                console.log("MAIN LOOP. Computer's moves made: " + movesMade[computer]);
 
                 // call negamax 
-                score = negamax(gamestateCopy, maxDepth, computer);
+                score = negamax(gamestateCopy, computer);
                 console.log("MAIN LOOP. score: " + score);
 
                 // undo speculative move after recursing
                 gamestateCopy[openSquares[i]] = '-';
-                var pop = movesMade[computer].pop();
-                console.log("MAIN LOOP. pop: " + pop);
+                movesMade[computer].pop();
                 
                 if (score > bestScore['val']) {
                     bestScore['val'] = score;
@@ -300,83 +246,77 @@
                 }
             }
             bestMove = document.getElementById('s' + bestScore['square']);
-            console.log("bestMove: " + bestMove);
-            makeMove(computer, bestMove);  // add delay of 400 here
+            window.setTimeout(makeMove, 800, computer, bestMove);
             currentPlayer = user;
         }
     }
 
     // calculate utility of each free square on the board
-    function negamax(gamestateCopy, depth, player) {
+    function negamax(gamestateCopy, player) {
         console.log("Negamaxing!");
         var i,
             winner,
-            max = -1000000,
+            bestScore,
+            score,
             possibleMoves = [],
             MOVES;
 
         // getOpenSquares(), passing in speculative gamestate
         possibleMoves = getOpenSquares(gamestateCopy);
-        console.log("Possible moves: " + possibleMoves);
-        console.log("GamestateCopy after calculating open squares: " + gamestateCopy);
-        
         MOVES = possibleMoves.length;
 
         // base case: if there are no plies left to explore (no open squares)
-        if (MOVES === 0 || depth === 0) {
+        winner = isGameOver(gamestateCopy);
+        if (winner) {
             console.log("At base case, done recursing.");
-            winner = checkWinner();
-            console.log("WINNER: " + winner);
-            if (winner === computer) return 1;
-            else if (winner === user) return -1;
-            else if (!winner) return 0;
+            if (winner === computer) {
+                console.log("returning 1");
+                return 1;
+            }
+            else if (winner === user) { 
+                console.log("returning -1");
+                return -1;
+            }
+            else if (winner === draw) {
+                console.log("tie, returning 0");
+                return 0;
+            }
         }
 
-        // toggle between players
-        if (player === user) {
-            player = computer;
-        } else player = user;
-        console.log("PLAYER IS " + player);
+        bestScore = -1000000;
 
-        // recurse!
+        // toggle between players
+        if (player === user) player = computer;
+        else player = user;
+        console.log("Player is " + player);
+
         for (i = 0; i < MOVES; i++) {
-            // var newGamestate = gamestateCopy;
 
             // mark speculative move on gameboard copy
             if (player === user) {
                 gamestateCopy[possibleMoves[i]] = user;
-                // console.log("Move: " + possibleMoves[i]);
                 movesMade[user].push(possibleMoves[i]);
-                // console.log("User's moves made: " + movesMade[user]);
-                // console.log("Speculative gamestate: " + gamestateCopy);
             } else if (player === computer) {
                 gamestateCopy[possibleMoves[i]] = computer;
                 movesMade[computer].push(possibleMoves[i]);
-                // console.log("Computer's moves made: " + movesMade[computer]);
-                // console.log("Speculative gamestate: " + gamestateCopy);
             }
+            console.log("GamestateCopy: " + gamestateCopy);
+            console.log("Moves made: O: " + movesMade[computer] + " X: " + movesMade[user]);
 
-            var bestScore = -negamax(gamestateCopy, depth - 1, player);
+            // recurse!
+            score = -negamax(gamestateCopy, player);
 
             // undo speculative move after recursing
             gamestateCopy[possibleMoves[i]] = '-';
-            if (player === user) {
-                // console.log("User's stack: " + movesMade[user]);
-                var popc = movesMade[user].pop();
-                // console.log("Pop from user's stack: " + popc);
-                // console.log("User's stack post-pop: " + movesMade[user]);
-            } else if (player === computer) {
-                // console.log("Computer's stack: " + movesMade[computer]);
-                var popu = movesMade[computer].pop();
-                // console.log("Pop: " + popu);
-                // console.log("Computer's stack post-pop: " + movesMade[computer]);
+            if (player === user) movesMade[user].pop();
+            else if (player === computer) movesMade[computer].pop();
+
+            if (score > bestScore) {
+                bestScore = score;
             }
 
-            if (bestScore > max) {
-                max = bestScore;
-            }
-        console.log("Max: " + max);
-        return max;
+        console.log("bestScore: " + bestScore);
+        return bestScore;
         }
     }
 }())
