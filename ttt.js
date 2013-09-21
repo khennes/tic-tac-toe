@@ -197,7 +197,7 @@
     
 
     /**
-     * Generate Computer's next move by calling negamax() from inside.
+     * Generate Computer's next move by invoking negamax(). 
      **/
 
     function computerMove() {
@@ -205,7 +205,6 @@
             winner,
             openSquares,
             OPEN,
-            gamestateCopy,
             score,
             bestScore = {},
             bestMove;
@@ -219,20 +218,18 @@
             openSquares = getOpenSquares(gamestate);
             OPEN = openSquares.length;
 
-            // make local copy of global gamestate
-            gamestateCopy = gamestate;
             for (i = 0; i < OPEN; i++) {
 
                 // make speculative move
-                gamestateCopy[openSquares[i]] = computer;
+                gamestate[openSquares[i]] = computer;
                 movesMade[computer].push(openSquares[i]);
 
                 // call negamax 
-                score = negamax(gamestateCopy, computer);
-                console.log("MAIN LOOP returns score for s" + openSquares[i] + ": " + score);
+                score = negamax(gamestate, computer);
+                console.log("returning score for s" + openSquares[i] + ": " + score);
 
                 // undo speculative move after recursing
-                gamestateCopy[openSquares[i]] = '-';
+                gamestate[openSquares[i]] = '-';
                 movesMade[computer].pop();
                 
                 if (score > bestScore['val']) {
@@ -260,7 +257,7 @@
      * returning the max score found.
      **/
  
-    function negamax(gamestateCopy, player) {
+    function negamax(gamestate, player) {
         var i,
             winner,
             bestScore = -9999,
@@ -268,7 +265,7 @@
             possibleMoves = [],
             MOVES;
 
-        winner = checkWinner(gamestateCopy);
+        winner = checkWinner(gamestate);
         if (winner) {
             if (winner === computer) return 1;
             else if (winner === user) return -1;
@@ -280,16 +277,16 @@
             if (player === computer) player = user;
             else player = computer;
 
-            possibleMoves = getOpenSquares(gamestateCopy);
+            possibleMoves = getOpenSquares(gamestate);
             MOVES = possibleMoves.length;
 
             for (i = 0; i < MOVES; i++) {
-                gamestateCopy[possibleMoves[i]] = player;
+                gamestate[possibleMoves[i]] = player;
                 movesMade[player].push(possibleMoves[i]);
 
-                score = -negamax(gamestateCopy, player);
+                score = -negamax(gamestate, player);
 
-                gamestateCopy[possibleMoves[i]] = '-';
+                gamestate[possibleMoves[i]] = '-';
                 movesMade[player].pop();
 
                 if (score > bestScore) {
