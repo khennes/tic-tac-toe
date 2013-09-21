@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    window.onload = initialize;
 
     /**
      * Define global variables.
@@ -26,6 +27,7 @@
     function initialize() {
         movesMade[computer] = [];
         movesMade[user] = [];
+        currentPlayer = null;
 
         // represent current state of gameboard with 'X', 'O', and '-'
         gamestate = ['-', '-', '-', '-', '-', '-', '-', '-', '-'];
@@ -37,8 +39,6 @@
         }
     }
     
-    window.onload = initialize;
-    
 
     /**
      * Allow user to reset game by clicking "Restart".
@@ -47,8 +47,22 @@
     var restartButton = document.getElementById('restart');
     restartButton.addEventListener('click', function(e) {
         game = false;
-        currentPlayer = null;  // necessary?
-        window.setTimeout(initialize, 1000);
+        window.setTimeout(initialize, 700);
+    });
+
+
+    /**
+     * Start game when user clicks 'Play game'.
+     **/
+
+    var playButton = document.getElementById('play');
+    playButton.addEventListener('click', function(e) {
+        if (game === false && currentPlayer === null) {
+            game = true;
+            currentPlayer = computer;
+            userMessage.innerHTML = "";
+            window.setTimeout(seedBoard, 400);
+        }
     });
 
 
@@ -69,21 +83,6 @@
         makeMove(computer, firstMove);
         currentPlayer = user;
     }
-
-
-    /**
-     * Start game when user clicks 'Play game'.
-     **/
-
-    var playButton = document.getElementById('play');
-    playButton.addEventListener('click', function(e) {
-        if (game === false) {
-            game = true;
-            currentPlayer = computer;
-            userMessage.innerHTML = "";
-            window.setTimeout(seedBoard, 400);
-        }
-    });
 
 
     /**
@@ -113,9 +112,7 @@
 
 
     /**
-     * Listen for user's move.
-     * EventListener is attached to the gameboard element,
-     * rather than individual squares.
+     * Event delegation: Listen for user's move.
      **/
 
     gameboard.addEventListener('click', function(e) {
@@ -161,7 +158,7 @@
      * If a winner is found, whether or not the gameboard is full, terminate 
      * the game and return 'computer' or 'user'.
      * If the gameboard is full and no winner is found, terminate the game and 
-     * return 'draw'; otherwise, the game continues & the function returns no value.
+     * return 'draw'; otherwise, the function returns no value & the game continues.
      **/
 
     function checkWinner(currentGamestate) {
@@ -186,10 +183,9 @@
         }
     }
 
-    // terminate game and report game result to user
+    // report game result to user
     function endGame(result) {
         game = false;
-        currentPlayer = null;  // necessary?
         if (result === computer) {
             userMessage.innerHTML = "Game over. You lose :)";
         } else if (result === user) {
@@ -218,8 +214,8 @@
         winner = checkWinner(gamestate);
         if (winner) endGame(winner);
         else {
-            bestScore['val'] = -1000;
-            bestScore['square'] = 100;
+            bestScore['val'] = -9999;
+            bestScore['square'] = 1000;
             openSquares = getOpenSquares(gamestate);
             OPEN = openSquares.length;
 
@@ -232,7 +228,7 @@
                 movesMade[computer].push(openSquares[i]);
 
                 // call negamax 
-                score = -negamax(gamestateCopy, computer);
+                score = negamax(gamestateCopy, computer);
                 console.log("MAIN LOOP returns score for s" + openSquares[i] + ": " + score);
 
                 // undo speculative move after recursing
@@ -276,15 +272,16 @@
         if (winner) {
             if (winner === computer) return 1;
             else if (winner === user) return -1;
-            else if (winner === draw) return 0;
+            else return 0;
 
         } else {
-            possibleMoves = getOpenSquares(gamestateCopy);
-            MOVES = possibleMoves.length;
 
             // toggle between players
             if (player === computer) player = user;
             else player = computer;
+
+            possibleMoves = getOpenSquares(gamestateCopy);
+            MOVES = possibleMoves.length;
 
             for (i = 0; i < MOVES; i++) {
                 gamestateCopy[possibleMoves[i]] = player;
@@ -299,7 +296,7 @@
                     bestScore = score;
                 }
             }
-            return score;
+            return bestScore;
         }
     }
 }())
