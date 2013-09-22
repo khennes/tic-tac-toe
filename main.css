@@ -25,9 +25,9 @@ body {
 #play, #restart {
     background-color: #e8ddcb;
     border: solid 3px #cdb380;
-    -webkit-border-radius: 15px;
-    -moz-border-radius: 15px;
-    border-radius: 15px;
+    -webkit-border-radius: 17px;
+    -moz-border-radius: 17px;
+    border-radius: 17px;
     color: #033649;
     font-family: 'Open Sans Condensed', sans-serif;
     font-size: 20px;
@@ -61,34 +61,21 @@ body {
     width: 100px;
 }
 
-#s1 {
+#s1, #s7 {
     border-top: 0;
-    border-right: solid #e8ddcb 4px;
+    border-right: solid #e8ddcb 3px;
     border-bottom: 0; 
-    border-left: solid #e8ddcb 4px;
+    border-left: solid #e8ddcb 3px;
 }
 
-#s3 {
-    border-top: solid #e8ddcb 4px;
+#s3, #s5 {
+    border-top: solid #e8ddcb 3px;
     border-right: 0;
-    border-bottom: solid #e8ddcb 4px;
+    border-bottom: solid #e8ddcb 3px;
     border-left: 0;
 }
 
 #s4 {
-    border: solid #e8ddcb 4px;
+    border: solid #e8ddcb 3px;
 }
 
-#s5 {
-    border-top: solid #e8ddcb 4px;
-    border-right: 0;
-    border-bottom: solid #e8ddcb 4px;
-    border-left: 0;
-}
-
-#s7 {
-    border-top: 0;
-    border-right: solid #e8ddcb 4px;
-    border-bottom: 0; 
-    border-left: solid #e8ddcb 4px;
-}
