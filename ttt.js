@@ -164,8 +164,9 @@
     function checkWinner(currentGamestate) {
         var win,
             WINS = possibleWins.length,
-            openSquares = getOpenSquares(currentGamestate);
+            openSquares;
 
+        // change syntax to "if (gameboard[a] === gameboard[b] === gameboard[c])"
         for (win = 0; win < WINS; win++) {
             if ((movesMade[computer].indexOf(possibleWins[win][0]) !== -1) && 
                 (movesMade[computer].indexOf(possibleWins[win][1]) !== -1) && 
@@ -176,10 +177,11 @@
                     (movesMade[user].indexOf(possibleWins[win][1]) !== -1) && 
                     (movesMade[user].indexOf(possibleWins[win][2]) !== -1)) {
                         return user;
-
-            } else if (openSquares.length === 0) {
-                return draw;
             }
+        }
+        openSquares = getOpenSquares(currentGamestate);
+        if (openSquares.length === 0) {
+            return draw;
         }
     }
 
@@ -205,40 +207,43 @@
             winner,
             openSquares,
             OPEN,
+            gamestateCopy,
             score,
-            bestScore = {},
-            bestMove;
+            bestScore = -9999,
+            bestMove = null,
+            nextMove;
 
         // check for a winner or tie. If neither, continue.
         winner = checkWinner(gamestate);
         if (winner) endGame(winner);
         else {
-            bestScore['val'] = -9999;
-            bestScore['square'] = 1000;
             openSquares = getOpenSquares(gamestate);
             OPEN = openSquares.length;
 
+            // make local copy of global gamestate
+            gamestateCopy = gamestate;
+
+            // call negamax for each available square
             for (i = 0; i < OPEN; i++) {
 
                 // make speculative move
-                gamestate[openSquares[i]] = computer;
+                gamestateCopy[openSquares[i]] = computer;
                 movesMade[computer].push(openSquares[i]);
 
-                // call negamax 
-                score = negamax(gamestate, computer);
-                console.log("returning score for s" + openSquares[i] + ": " + score);
+                score = negamax(gamestateCopy, computer);
+                console.log("score for s" + openSquares[i] + ": " + score);
 
-                // undo speculative move after recursing
-                gamestate[openSquares[i]] = '-';
+                // undo speculative move
+                gamestateCopy[openSquares[i]] = '-';
                 movesMade[computer].pop();
                 
-                if (score > bestScore['val']) {
-                    bestScore['val'] = score;
-                    bestScore['square'] = openSquares[i];
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = openSquares[i];
                 }
             }
-            bestMove = document.getElementById('s' + bestScore['square']);
-            window.setTimeout(makeMove, 800, computer, bestMove);
+            nextMove = document.getElementById('s' + bestMove);
+            window.setTimeout(makeMove, 800, computer, nextMove);
             currentPlayer = user;
         }
     }
@@ -249,15 +254,15 @@
      * Calculate the utility of each available square
      * and return the highest score.
      *
-     * If there are no plies left to explore (no open squares),
-     * call checkWinner() to check for a winner or a tie.
+     * Base case: There are no plies left to explore if checkWinner() 
+     * returns a winner or a draw.
      *
      * Otherwise, the game continues: for each possible speculative 
      * move, mark the board, call negamax(), then undo the move,
      * returning the max score found.
      **/
  
-    function negamax(gamestate, player) {
+    function negamax(gamestateCopy, player) {
         var i,
             winner,
             bestScore = -9999,
@@ -265,11 +270,11 @@
             possibleMoves = [],
             MOVES;
 
-        winner = checkWinner(gamestate);
+        winner = checkWinner(gamestateCopy);
         if (winner) {
-            if (winner === computer) return 1;
-            else if (winner === user) return -1;
-            else return 0;
+            if (winner === player) return 1;
+            else if (winner === draw) return 0;
+            else return -1;
 
         } else {
 
@@ -277,16 +282,20 @@
             if (player === computer) player = user;
             else player = computer;
 
-            possibleMoves = getOpenSquares(gamestate);
+            possibleMoves = getOpenSquares(gamestateCopy);
             MOVES = possibleMoves.length;
 
             for (i = 0; i < MOVES; i++) {
-                gamestate[possibleMoves[i]] = player;
+
+                // make speculative move
+                gamestateCopy[possibleMoves[i]] = player;
                 movesMade[player].push(possibleMoves[i]);
 
-                score = -negamax(gamestate, player);
+                // recurse!
+                score = -negamax(gamestateCopy, player);
 
-                gamestate[possibleMoves[i]] = '-';
+                // undo speculative move
+                gamestateCopy[possibleMoves[i]] = '-';
                 movesMade[player].pop();
 
                 if (score > bestScore) {
