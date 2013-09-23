@@ -71,13 +71,12 @@
     */
 
     function seedBoard() {
-        var randomCorner = Math.floor(Math.random()*4),
+        var randomCorner = Math.floor(Math.random()*3),
             corners = {
                 0: 's0',
                 1: 's2',
-                2: 's4',
-                3: 's6',
-                4: 's8'
+                2: 's6',
+                3: 's8'
             },
             firstMove = document.getElementById(corners[randomCorner]);
         makeMove(computer, firstMove);
@@ -284,7 +283,7 @@
      * Calculate the utility of each available square.
      *
      * Base case: There are no plies left to explore if checkWinner() 
-     * returns a winner or a draw, or if the specified depth to be searched has 
+     * returns a winner or a draw, or if the specified search depth has 
      * been reached (ie, depth === 0).
      *
      * Otherwise, negamax() calls itself again: for each possible speculative 
