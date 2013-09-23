@@ -207,8 +207,9 @@
      * gamestate array. For each square, make the move and call negamax() on it,
      * then undo the move.
      *
-     * Negamax calls itself recursively until reaching a final gamestate (computer
-     * wins, user wins, or game ends in a draw), returning a score for that gamestate.
+     * Then, loop through the list of returned scores, this time calling negamax() 
+     * only on the squares given the best score. If the move leads to an immediate
+     * win or an immediate loss, make it; otherwise, make the next best possible move.
      **/
 
     function computerMove() {
@@ -218,9 +219,9 @@
             OPEN,
             gamestateCopy,
             score,
+            scores = [],
             bestScore = -9999,
             bestMove = null,
-            scores = [],
             nextMove;
 
         // check for a winner or tie. If neither, continue.
@@ -229,20 +230,15 @@
         else {
             openSquares = getOpenSquares(gamestate);
             OPEN = openSquares.length;
-
-            // make local copy of global gamestate
             gamestateCopy = gamestate;
 
-            // call negamax for each available square
             for (i = 0; i < OPEN; i++) {
 
                 // make speculative move
                 gamestateCopy[openSquares[i]] = computer;
-                movesMade[computer].push(openSquares[i]);
 
+                // compute score & append to 'scores' 
                 score = negamax(gamestateCopy, computer, 7);
-                console.log("score for s" + openSquares[i] + ": " + score);
-
                 scores.push(score);
 
                 if (score > bestScore) {
@@ -252,32 +248,27 @@
 
                 // undo speculative move
                 gamestateCopy[openSquares[i]] = '-';
-                movesMade[computer].pop();
             }
 
-            // call negamax on each square given the bestScore
+            // repeat the above procedure for all squares given the best score;
+            // check if the move will lead to either an immediate win or an immediate loss
             for (i = 0; i < OPEN; i++) {
                 if (scores[i] === bestScore) {
-
-                    console.log("score: s" + openSquares[i] + ": " + scores[i]);
-
                     gamestateCopy[openSquares[i]] = computer;
-                    movesMade[computer].push(openSquares[i]);
 
                     if (negamax(gamestateCopy, computer, 0) === 1) {
-                        console.log("immediate win, i=" + openSquares[i]);
+                        console.log("immediate win");
                         bestMove = openSquares[i];
                         break;
                     } else if (negamax(gamestateCopy, computer, 1) !== -1) {
-                        console.log("immediate loss, i=" + openSquares[i]);
+                        console.log("block a loss");
                         bestMove = openSquares[i];
-                    } else {
-                        console.log(negamax(gamestateCopy, computer, 0));
-                        console.log(negamax(gamestateCopy, computer, 1));
+                    } else if (negamax(gamestateCopy, computer, 1) === 1) {
+                        console.log("make the next best move");
+                        bestMove = openSquares[i];
                     }
 
                     gamestateCopy[openSquares[i]] = '-';
-                    movesMade[computer].pop();
                 }
             }
             
@@ -290,13 +281,14 @@
 
     /**
      * Negamax algorithm:
-     * Calculate the utility of each available square & return the highest score.
+     * Calculate the utility of each available square.
      *
      * Base case: There are no plies left to explore if checkWinner() 
-     * returns a winner or a draw.
+     * returns a winner or a draw, or if the specified depth to be searched has 
+     * been reached (ie, depth === 0).
      *
      * Otherwise, negamax() calls itself again: for each possible speculative 
-     * move, mark the board, recurse, then undo the move, returning the 
+     * move, it marks the board, recurses, then undoes the move, returning the 
      * highest score found.
      **/
  
@@ -310,13 +302,14 @@
             MOVES;
 
         winner = checkWinner(gamestateCopy);
+        
         if (winner) {
             if (winner === player) return 1;
             else if (winner === draw) return 0;
             else return -1;
         } else if (!winner && depth == 0) {
-            return 5;
-
+            return 5;  // for immediate win/loss checking 
+            
         } else {
             possibleMoves = getOpenSquares(gamestateCopy);
             MOVES = possibleMoves.length;
@@ -325,18 +318,12 @@
             if (player === computer) player = user;
             else player = computer;
 
+            // make each speculative move, recurse, & undo move
             for (i = 0; i < MOVES; i++) {
 
-                // make speculative move
                 gamestateCopy[possibleMoves[i]] = player;
-                movesMade[player].push(possibleMoves[i]);
-
-                // recurse!
                 score = -negamax(gamestateCopy, player, depth - 1);
-
-                // undo speculative move
                 gamestateCopy[possibleMoves[i]] = '-';
-                movesMade[player].pop();
 
                 if (score > bestScore) {
                     bestScore = score;
