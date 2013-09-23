@@ -207,9 +207,9 @@
      * gamestate array. For each square, make the move and call negamax() on it,
      * then undo the move.
      *
-     * Then, loop through the list of returned scores, this time calling negamax() 
-     * only on the squares given the best score. If the move leads to an immediate
-     * win or an immediate loss, make it; otherwise, make the next best possible move.
+     * Then, loop through the list of returned scores, this time calling negamax() only 
+     * on the squares given the best score. If the move results in an immediate win or 
+     * prevents an immediate loss, make it; otherwise, choose the next best possible move.
      **/
 
     function computerMove() {
@@ -251,7 +251,7 @@
             }
 
             // repeat the above procedure for all squares given the best score;
-            // check if the move will lead to either an immediate win or an immediate loss
+            // check if the move will result in an immediate win or block an immediate loss
             for (i = 0; i < OPEN; i++) {
                 if (scores[i] === bestScore) {
                     gamestateCopy[openSquares[i]] = computer;
