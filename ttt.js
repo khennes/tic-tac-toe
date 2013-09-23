@@ -152,31 +152,29 @@
     /**
      * Check gameboard for a winning three-in-a-row.
      *
-     * Loop through 8 possible winning "triplets" and check if any 3 squares 
-     * are all contained within User's or Computer's movesMade. 
+     * Loop through the 8 possible winning triplets, where 'a' is the first
+     * square in a winning triplet, 'b' is the second square, & 'c' is the third.
      *
-     * If a winner is found, whether or not the gameboard is full, terminate 
-     * the game and return 'computer' or 'user'.
-     * If the gameboard is full and no winner is found, terminate the game and 
-     * return 'draw'; otherwise, the function returns no value & the game continues.
+     * If a winner is found (ie, all three squares are occupied by either
+     * an 'X' or an 'O', return 'computer' or 'user' (whether or not the 
+     * gameboard is full). If the gameboard is full and no winner is found, 
+     * return 'draw'. Otherwise, the function returns no value & the game continues.
      **/
 
     function checkWinner(currentGamestate) {
-        var win,
+        var a, b, c, win,
             WINS = possibleWins.length,
             openSquares;
 
-        // change syntax to "if (gameboard[a] === gameboard[b] === gameboard[c])"
         for (win = 0; win < WINS; win++) {
-            if ((movesMade[computer].indexOf(possibleWins[win][0]) !== -1) && 
-                (movesMade[computer].indexOf(possibleWins[win][1]) !== -1) && 
-                (movesMade[computer].indexOf(possibleWins[win][2]) !== -1)) {
+            a = currentGamestate[possibleWins[win][0]];
+            b = currentGamestate[possibleWins[win][1]];
+            c = currentGamestate[possibleWins[win][2]];
+
+            if (a === b && a === c && a === computer) {
                 return computer;
-            
-            } else if ((movesMade[user].indexOf(possibleWins[win][0]) !== -1) && 
-                    (movesMade[user].indexOf(possibleWins[win][1]) !== -1) && 
-                    (movesMade[user].indexOf(possibleWins[win][2]) !== -1)) {
-                        return user;
+            } else if (a === b && a === c && a === user) {
+                return user;
             }
         }
         openSquares = getOpenSquares(currentGamestate);
@@ -185,7 +183,11 @@
         }
     }
 
-    // report game result to user
+
+    /**
+     * Report game result to user.
+     **/
+
     function endGame(result) {
         game = false;
         if (result === computer) {
@@ -200,6 +202,13 @@
 
     /**
      * Generate Computer's next move by invoking negamax(). 
+     *
+     * Fetch a list of open squares and create a copy of the global
+     * gamestate array. For each square, make the move and call negamax() on it,
+     * then undo the move.
+     *
+     * Negamax calls itself recursively until reaching a final gamestate (computer
+     * wins, user wins, or game ends in a draw), returning a score for that gamestate.
      **/
 
     function computerMove() {
@@ -211,6 +220,7 @@
             score,
             bestScore = -9999,
             bestMove = null,
+            scores = [],
             nextMove;
 
         // check for a winner or tie. If neither, continue.
@@ -230,18 +240,46 @@
                 gamestateCopy[openSquares[i]] = computer;
                 movesMade[computer].push(openSquares[i]);
 
-                score = negamax(gamestateCopy, computer);
+                score = negamax(gamestateCopy, computer, 7);
                 console.log("score for s" + openSquares[i] + ": " + score);
+
+                scores.push(score);
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = openSquares[i];  // default
+                }
 
                 // undo speculative move
                 gamestateCopy[openSquares[i]] = '-';
                 movesMade[computer].pop();
-                
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = openSquares[i];
+            }
+
+            // call negamax on each square given the bestScore
+            for (i = 0; i < OPEN; i++) {
+                if (scores[i] === bestScore) {
+
+                    console.log("score: s" + openSquares[i] + ": " + scores[i]);
+
+                    gamestateCopy[openSquares[i]] = computer;
+                    movesMade[computer].push(openSquares[i]);
+
+                    if (negamax(gamestateCopy, computer, 0) === 1) {
+                        console.log("immediate win, i=" + openSquares[i]);
+                        bestMove = openSquares[i];
+                    } else if (negamax(gamestateCopy, computer, 1) !== -1) {
+                        console.log("immediate loss, i=" + openSquares[i]);
+                        bestMove = openSquares[i];
+                    } else {
+                        console.log(negamax(gamestateCopy, computer, 0));
+                        console.log(negamax(gamestateCopy, computer, 1));
+                    }
+
+                    gamestateCopy[openSquares[i]] = '-';
+                    movesMade[computer].pop();
                 }
             }
+            
             nextMove = document.getElementById('s' + bestMove);
             window.setTimeout(makeMove, 800, computer, nextMove);
             currentPlayer = user;
@@ -251,22 +289,22 @@
 
     /**
      * Negamax algorithm:
-     * Calculate the utility of each available square
-     * and return the highest score.
+     * Calculate the utility of each available square & return the highest score.
      *
      * Base case: There are no plies left to explore if checkWinner() 
      * returns a winner or a draw.
      *
-     * Otherwise, the game continues: for each possible speculative 
-     * move, mark the board, call negamax(), then undo the move,
-     * returning the max score found.
+     * Otherwise, negamax() calls itself again: for each possible speculative 
+     * move, mark the board, recurse, then undo the move, returning the 
+     * highest score found.
      **/
  
-    function negamax(gamestateCopy, player) {
+    function negamax(gamestateCopy, player, depth) {
         var i,
             winner,
             bestScore = -9999,
             score,
+            nextMove,
             possibleMoves = [],
             MOVES;
 
@@ -275,15 +313,16 @@
             if (winner === player) return 1;
             else if (winner === draw) return 0;
             else return -1;
+        } else if (!winner && depth == 0) {
+            return 5;
 
         } else {
+            possibleMoves = getOpenSquares(gamestateCopy);
+            MOVES = possibleMoves.length;
 
             // toggle between players
             if (player === computer) player = user;
             else player = computer;
-
-            possibleMoves = getOpenSquares(gamestateCopy);
-            MOVES = possibleMoves.length;
 
             for (i = 0; i < MOVES; i++) {
 
@@ -292,7 +331,7 @@
                 movesMade[player].push(possibleMoves[i]);
 
                 // recurse!
-                score = -negamax(gamestateCopy, player);
+                score = -negamax(gamestateCopy, player, depth - 1);
 
                 // undo speculative move
                 gamestateCopy[possibleMoves[i]] = '-';
