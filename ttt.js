@@ -156,7 +156,7 @@
      * square in a winning triplet, 'b' is the second square, & 'c' is the third.
      *
      * If a winner is found (ie, all three squares are occupied by either
-     * an 'X' or an 'O', return 'computer' or 'user' (whether or not the 
+     * an 'X' or an 'O'), return 'computer' or 'user' (whether or not the 
      * gameboard is full). If the gameboard is full and no winner is found, 
      * return 'draw'. Otherwise, the function returns no value & the game continues.
      **/
@@ -255,24 +255,22 @@
                 movesMade[computer].pop();
             }
 
-            // call negamax on each square given the bestScore
+            // for each move given the best score, check if it will lead to
+            // an immediate win, or, if not, to an immediate loss
             for (i = 0; i < OPEN; i++) {
                 if (scores[i] === bestScore) {
-
-                    console.log("score: s" + openSquares[i] + ": " + scores[i]);
 
                     gamestateCopy[openSquares[i]] = computer;
                     movesMade[computer].push(openSquares[i]);
 
+                    // check if a move will lead to an immediate win
                     if (negamax(gamestateCopy, computer, 0) === 1) {
-                        console.log("immediate win, i=" + openSquares[i]);
                         bestMove = openSquares[i];
+                        break;
+
+                    // if not, check if it will lead to an immediate loss
                     } else if (negamax(gamestateCopy, computer, 1) !== -1) {
-                        console.log("immediate loss, i=" + openSquares[i]);
                         bestMove = openSquares[i];
-                    } else {
-                        console.log(negamax(gamestateCopy, computer, 0));
-                        console.log(negamax(gamestateCopy, computer, 1));
                     }
 
                     gamestateCopy[openSquares[i]] = '-';
@@ -313,8 +311,6 @@
             if (winner === player) return 1;
             else if (winner === draw) return 0;
             else return -1;
-        } else if (!winner && depth == 0) {
-            return 5;
 
         } else {
             possibleMoves = getOpenSquares(gamestateCopy);
