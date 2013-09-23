@@ -2,6 +2,12 @@
 
 body {
     background: #031634;
+    background-image: -moz-radial-gradient(center, circle contain, #06244F 25%, #031634 100%);    
+    background-image: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(25%,#06244F), color-stop(100%,#031634));
+    background-image: -webkit-radial-gradient(center, circle contain, #06244F 25%,#031634 100%);
+    background-image: -o-radial-gradient(center, circle contain, #06244F 25%,#031634 100%);
+    background-image: -ms-radial-gradient(center, circle contain, #06244F 25%,#031634 100%);
+    background-image: radial-gradient(circle at center, #06244F 25%,#031634 100%);
     color: #e8ddcb;
     font-size: 18px;
     margin: 60px;
@@ -23,10 +29,9 @@ body {
 }
 
 #play, #restart {
+    cursor: pointer;
     background-color: #e8ddcb;
     border: solid 3px #cdb380;
-    -webkit-border-radius: 17px;
-    -moz-border-radius: 17px;
     border-radius: 17px;
     color: #033649;
     font-family: 'Open Sans Condensed', sans-serif;
@@ -39,6 +44,10 @@ body {
     padding-right: 8px;
 }
 
+#play:hover, #restart:hover {
+    background-color: #cdb380;
+}
+
 #restart {
     margin-left: 15px;
     padding: 5px 10px 5px 10px;
@@ -49,6 +58,10 @@ body {
     width: 308px;
     margin: 0 auto;
     padding: 15px 0 50px 0;
+}
+
+#gameboard:hover {
+    cursor: pointer;
 }
 
 .box {
@@ -79,3 +92,11 @@ body {
     border: solid #e8ddcb 3px;
 }
 
+#contact {
+    color: #e8ddcb;
+    font-family: 'Indie Flower', sans-serif;
+    font-size: 24px;
+    margin-top: 40px;
+    margin-right: 40px;
+    text-align: right;
+}
