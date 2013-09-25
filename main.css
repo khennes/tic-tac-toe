@@ -20,6 +20,7 @@ body {
     margin: 0 auto;
     padding-bottom: 35px;
     width: 375px;
+    text-align: center;
 }
 
 #play-game {
