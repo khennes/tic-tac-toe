@@ -239,16 +239,9 @@
             gamestateCopy = gamestate;  // make local copy of gameboard
 
             for (i = 0; i < OPEN; i++) {
-
-                // make speculative move
-                gamestateCopy[openSquares[i]] = computer;
-
-                // compute score & append to 'scores' 
-                score = negamax(gamestateCopy, computer);
-                console.log(openSquares[i] + ": " + score);
-
-                // undo speculative move
-                gamestateCopy[openSquares[i]] = '-';
+                gamestateCopy[openSquares[i]] = computer;  // make speculative move
+                score = negamax(gamestateCopy, computer);  // call negamax on each square
+                gamestateCopy[openSquares[i]] = '-';  // undo move
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -303,7 +296,7 @@
             score = -negamax(gamestateCopy, player);
             gamestateCopy[possibleMoves[i]] = '-';
 
-            if (score < bestScore) {
+            if (score < bestScore) {  // return the worst-case score for each square
                 bestScore = score;
             }
         }
